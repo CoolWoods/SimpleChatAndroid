@@ -11,7 +11,7 @@ public class Friend implements Serializable {
     private String tel;
     private String birthday;
     private String email;
-    private String imgSrc;
+    private String head;
     private String signature;
 
     public String getUsername() {
@@ -78,12 +78,12 @@ public class Friend implements Serializable {
         this.email = email;
     }
 
-    public String getImgSrc() {
-        return imgSrc;
+    public String getHead() {
+        return head;
     }
 
-    public void setImgSrc(String imgSrc) {
-        this.imgSrc = imgSrc;
+    public void setHead(String head) {
+        this.head = head;
     }
 
     public String getSignature() {

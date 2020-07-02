@@ -99,7 +99,7 @@ public class FriendListFragment extends ListFragment {
 
     private Request initRequest(){
         //定义访问的api
-        String url = BASE_URL + "message/getFriendList";
+        String url = BASE_URL + "contact/getFriendList";
         Map<String, String> reqMap = new HashMap<String, String>();
         reqMap.put("username", "123456");
         return RequestUtils.buildRequestForPostByForm(url, reqMap);
