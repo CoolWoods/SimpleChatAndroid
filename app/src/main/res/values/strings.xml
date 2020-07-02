@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">简信</string>
+    <string name="title_home">个人中心</string>
+    <string name="title_friendlist">通讯录</string>
+    <string name="title_message">消息</string>
+    <string name="btn_send">发送</string>
+</resources>
