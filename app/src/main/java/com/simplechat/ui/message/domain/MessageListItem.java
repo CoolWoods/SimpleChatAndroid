@@ -7,25 +7,9 @@ public class MessageListItem implements Serializable {
     private String username;
     private  String nickname;
     private String fUsername;
-    private String imgSrc;
+    private String head;
     private String lastMsg;
     private Date lastMsgDate;
-
-    public String getFUsername() {
-        return fUsername;
-    }
-
-    public void setFUsername(String fUsername) {
-        this.fUsername = fUsername;
-    }
-
-    public Date getLastMsgDate() {
-        return lastMsgDate;
-    }
-
-    public void setLastMsgDate(Date lastMsgDate) {
-        this.lastMsgDate = lastMsgDate;
-    }
 
     public String getUsername() {
         return username;
@@ -43,12 +27,20 @@ public class MessageListItem implements Serializable {
         this.nickname = nickname;
     }
 
-    public String getImgSrc() {
-        return imgSrc;
+    public String getFUsername() {
+        return fUsername;
     }
 
-    public void setImgSrc(String imgSrc) {
-        this.imgSrc = imgSrc;
+    public void setFUsername(String fUsername) {
+        this.fUsername = fUsername;
+    }
+
+    public String getHead() {
+        return head;
+    }
+
+    public void setHead(String head) {
+        this.head = head;
     }
 
     public String getLastMsg() {
@@ -57,5 +49,13 @@ public class MessageListItem implements Serializable {
 
     public void setLastMsg(String lastMsg) {
         this.lastMsg = lastMsg;
+    }
+
+    public Date getLastMsgDate() {
+        return lastMsgDate;
+    }
+
+    public void setLastMsgDate(Date lastMsgDate) {
+        this.lastMsgDate = lastMsgDate;
     }
 }

@@ -1,6 +1,7 @@
 package com.simplechat.ui.friendlist;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,9 +22,12 @@ import com.simplechat.R;
 import com.simplechat.ui.chat.ChatActivity;
 import com.simplechat.ui.domain.User;
 import com.simplechat.ui.friendlist.domain.Friend;
+import com.simplechat.utils.FileUtils;
 import com.simplechat.utils.OkHttpUtils;
 import com.simplechat.utils.RequestUtils;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -44,11 +48,14 @@ public class FriendListFragment extends ListFragment {
     private FriendListAdapter adapter;
     private static List<Friend> friendList;
     private static final   String BASE_URL = "http://10.0.2.2:8080/SimpleChat/";
+    private static User user;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //ListView的适配器
         //发送请求获取数据，并更新适配器数据
+        user = new User();
+        user.setUsername("123456");
         sendRequestAndUpdateAdaptor();
     }
 
@@ -95,6 +102,16 @@ public class FriendListFragment extends ListFragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+        //将消息存到本地，以便无网时使用
+        try {
+            FileOutputStream fos = this.getActivity().openFileOutput("friendList"+ user.getUsername() + ".dat", Context.MODE_PRIVATE);
+            fos.write(responseData.getBytes());
+            fos.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private Request initRequest(){
@@ -105,6 +122,14 @@ public class FriendListFragment extends ListFragment {
         return RequestUtils.buildRequestForPostByForm(url, reqMap);
     }
     private void sendRequestAndUpdateAdaptor(){
+        //从文件中获取联系人列表
+        try {
+            FileInputStream fis = this.getActivity().openFileInput("friendList"+user.getUsername() + ".dat");
+            String readTextFile = FileUtils.readTextFile(fis);
+            setAdapter(readTextFile);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         //放在try catch里面运行，避免程序闪退
         try {
             //handler start

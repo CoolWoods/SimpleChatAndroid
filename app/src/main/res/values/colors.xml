@@ -9,6 +9,6 @@
     <color name="colorNickname">#4B4B4B</color>
     <color name="colorDivider">#C0C0C0</color>
     <color name="colorSendBtnText">#f0fcff</color>
-    <color name="colorHomeBgc">#f0fcff</color>
+    <color name="colorHomeBgc">#ffffff</color>
     <color name="colorHomeBox">#ffffff</color>
 </resources>

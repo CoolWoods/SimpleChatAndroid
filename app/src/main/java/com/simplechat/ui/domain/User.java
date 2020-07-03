@@ -3,10 +3,17 @@ package com.simplechat.ui.domain;
 import java.io.Serializable;
 
 public class User implements Serializable {
+
     private String username;
-    private  String nickname;
-    private int imgSrc;
-    private String userSign;
+    private String nickname;
+    private String remark;
+    private String sex;
+    private String tel;
+    private String birthday;
+    private String email;
+    private String head;
+    private String signature;
+
 
     public String getUsername() {
         return username;
@@ -24,19 +31,59 @@ public class User implements Serializable {
         this.nickname = nickname;
     }
 
-    public int getImgSrc() {
-        return imgSrc;
+    public String getRemark() {
+        return remark;
     }
 
-    public void setImgSrc(int imgSrc) {
-        this.imgSrc = imgSrc;
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
-    public String getUserSign() {
-        return userSign;
+    public String getSex() {
+        return sex;
     }
 
-    public void setUserSign(String userSign) {
-        this.userSign = userSign;
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getHead() {
+        return head;
+    }
+
+    public void setHead(String head) {
+        this.head = head;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }

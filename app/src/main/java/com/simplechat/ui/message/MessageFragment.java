@@ -1,6 +1,7 @@
 package com.simplechat.ui.message;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,10 +20,16 @@ import androidx.fragment.app.ListFragment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
 import com.simplechat.ui.chat.ChatActivity;
+import com.simplechat.ui.domain.User;
+import com.simplechat.ui.friendlist.domain.Friend;
 import com.simplechat.ui.message.domain.MessageListItem;
+import com.simplechat.utils.FileUtils;
 import com.simplechat.utils.OkHttpUtils;
 import com.simplechat.utils.RequestUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -41,12 +48,15 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 public class MessageFragment extends ListFragment {
 
     private static MessageAdapter adapter;
-    private static List<MessageListItem> messageListItemList;
+    private static List<MessageListItem> messageList;
     private static final   String BASE_URL = "http://10.0.2.2:8080/SimpleChat/";
+    private static User user;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //发送请求获取数据，并更新适配器数据
+        user = new User();
+        user.setUsername("123456");
         sendRequestAndUpdateAdaptor();
     }
 
@@ -63,27 +73,43 @@ public class MessageFragment extends ListFragment {
         TextView nickname = (TextView) v.findViewById(R.id.nickname);
         Intent intent = new Intent(getActivity(), ChatActivity.class);
         //用数据捆传递数据
-        MessageListItem messageListItem = messageListItemList.get(position);
-        System.out.println(messageListItem);
+        MessageListItem messageListItem = messageList.get(position);
+
+        //封装一个friend对象传给给消息页面
+        Friend friend = new Friend();
+        friend.setFUsername(messageListItem.getFUsername());
+        friend.setUsername(messageListItem.getUsername());
+        friend.setNickname(messageListItem.getNickname());
+
         Bundle bundle = new Bundle();
-        bundle.putSerializable("messageListItem", (Serializable) messageListItem);
+        bundle.putSerializable("friend", (Serializable) friend);
         intent.putExtra("bun", bundle);
         startActivity(intent);
     }
 
     private void setAdapter(String responseData){
+
         try {
             //利用Jackson将返回的数据反序列化成Java对象
             ObjectMapper objectMapper = new ObjectMapper();
             MessageListItem[] messageListItems = objectMapper.readValue(responseData, MessageListItem[].class);
-            messageListItemList = Arrays.asList(messageListItems);
+            messageList = Arrays.asList(messageListItems);
 
             //利用请求得到的数据List来实例化一个新的适配器
-            adapter = new MessageAdapter(this.getActivity(), android.R.layout.simple_list_item_1, messageListItemList);
+            adapter = new MessageAdapter(this.getActivity(), android.R.layout.simple_list_item_1, messageList);
 
             //调用父类ListFragment的setListAdapter设置适配器
             setListAdapter(adapter);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //将消息存到本地，以便无网时使用
+        try {
+            FileOutputStream fos = this.getActivity().openFileOutput("messageList"+ user.getUsername() + ".dat", Context.MODE_PRIVATE);
+            fos.write(responseData.getBytes());
+            fos.close();
+        } catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -102,7 +128,15 @@ public class MessageFragment extends ListFragment {
     }
 
     private void sendRequestAndUpdateAdaptor(){
-        //放在try catch里面运行，避免程序闪退
+        //从文件中获取消息列表
+        try {
+            FileInputStream fis = this.getActivity().openFileInput("messageList"+user.getUsername() + ".dat");
+            String readTextFile = FileUtils.readTextFile(fis);
+            setAdapter(readTextFile);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //从服务器获取消息列表
         try {
             //handler start
             @SuppressLint("HandlerLeak") Handler handler = new Handler() {
