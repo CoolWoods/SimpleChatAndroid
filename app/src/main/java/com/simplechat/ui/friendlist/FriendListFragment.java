@@ -19,9 +19,9 @@ import androidx.fragment.app.ListFragment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
-import com.simplechat.ui.chat.ChatActivity;
 import com.simplechat.ui.domain.User;
 import com.simplechat.ui.friendlist.domain.Friend;
+import com.simplechat.ui.userinfo.UserInfoActivity;
 import com.simplechat.utils.FileUtils;
 import com.simplechat.utils.OkHttpUtils;
 import com.simplechat.utils.RequestUtils;
@@ -48,14 +48,14 @@ public class FriendListFragment extends ListFragment {
     private FriendListAdapter adapter;
     private static List<Friend> friendList;
     private static final   String BASE_URL = "http://10.0.2.2:8080/SimpleChat/";
+    //当前登录的用户
     private static User user;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //ListView的适配器
         //发送请求获取数据，并更新适配器数据
-        user = new User();
-        user.setUsername("123456");
+       init();
         sendRequestAndUpdateAdaptor();
     }
 
@@ -67,60 +67,42 @@ public class FriendListFragment extends ListFragment {
         return view;
     }
 
+
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         TextView nickname = (TextView)v.findViewById(R.id.nickname);
-        Intent intent = new Intent(getActivity(), ChatActivity.class);
+        Intent intent = new Intent(getActivity(), UserInfoActivity.class);
         //用数据捆传递数据
-        User me = new User();
-        User friend = new User();
-        Map<String, User> userMap = new HashMap<String, User>();
-        me.setNickname("孙悟空");
-        friend.setNickname(nickname.getText().toString());
-        userMap.put("me", me);
-        userMap.put("friend", friend);
+        Friend friend = friendList.get(position);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("userMap", (Serializable) userMap);
+        bundle.putSerializable("friend", (Serializable) friend);
         //把数据捆设置改意图
-        intent.putExtra("bun", bundle);
+        intent.putExtra("friendBundle", bundle);
         startActivity(intent);
     }
 
-    private void setAdapter(String responseData){
-        try {
-            //利用Jackson将返回的数据反序列化成Java对象
-            ObjectMapper objectMapper = new ObjectMapper();
-            Friend[] friends = objectMapper.readValue(responseData, Friend[].class);
-            friendList = Arrays.asList(friends);
+    private void init(){
+//        从loginActivity中获取user对象
+//        Bundle userBundle = this.getActivity().getIntent().getBundleExtra("userBundle");
+//        User user = (User) userBundle.getSerializable("user");
 
-            //利用请求得到的数据List来实例化一个新的适配器
-            adapter = new FriendListAdapter(this.getActivity(), android.R.layout.simple_list_item_1, friendList);
-
-            //调用父类ListFragment的setListAdapter设置适配器
-            setListAdapter(adapter);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        //将消息存到本地，以便无网时使用
-        try {
-            FileOutputStream fos = this.getActivity().openFileOutput("friendList"+ user.getUsername() + ".dat", Context.MODE_PRIVATE);
-            fos.write(responseData.getBytes());
-            fos.close();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        //暂时使用假数据
+        Intent intent = this.getActivity().getIntent();
+        Bundle userBundle = intent.getBundleExtra("userBundle");
+        assert userBundle != null;
+        user = (User) userBundle.getSerializable("user");
     }
+
 
     private Request initRequest(){
         //定义访问的api
         String url = BASE_URL + "contact/getFriendList";
         Map<String, String> reqMap = new HashMap<String, String>();
-        reqMap.put("username", "123456");
+        reqMap.put("username", user.getUsername());
         return RequestUtils.buildRequestForPostByForm(url, reqMap);
     }
+
     private void sendRequestAndUpdateAdaptor(){
         //从文件中获取联系人列表
         try {
@@ -183,4 +165,32 @@ public class FriendListFragment extends ListFragment {
             Log.e(TAG, "handler failure", e);
         }
     }
+
+    private void setAdapter(String responseData){
+        try {
+            //利用Jackson将返回的数据反序列化成Java对象
+            ObjectMapper objectMapper = new ObjectMapper();
+            Friend[] friends = objectMapper.readValue(responseData, Friend[].class);
+            friendList = Arrays.asList(friends);
+
+            //利用请求得到的数据List来实例化一个新的适配器
+            adapter = new FriendListAdapter(this.getActivity(), android.R.layout.simple_list_item_1, friendList);
+
+            //调用父类ListFragment的setListAdapter设置适配器
+            setListAdapter(adapter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //将消息存到本地，以便无网时使用
+        try {
+            FileOutputStream fos = this.getActivity().openFileOutput("friendList"+ user.getUsername() + ".dat", Context.MODE_PRIVATE);
+            fos.write(responseData.getBytes());
+            fos.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 }

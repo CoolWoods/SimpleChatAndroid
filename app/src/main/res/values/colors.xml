@@ -3,12 +3,14 @@
     <color name="colorPrimary">#16a951</color>
     <color name="colorPrimaryDark">#0aa344</color>
     <color name="colorAccent">#21a675</color>
-    <color name="colorFontNormal">#333333</color>
+    <color name="colorFontNormal">#4B4B4B</color>
     <color name="colorTime">#C0C0C0</color>
     <color name="colorRecentMsg">#969696</color>
     <color name="colorNickname">#4B4B4B</color>
     <color name="colorDivider">#C0C0C0</color>
     <color name="colorSendBtnText">#f0fcff</color>
-    <color name="colorHomeBgc">#ffffff</color>
+    <color name="colorDarkBackground">#eeeeee</color>
+    <color name="colorLightBackground">#ffffff</color>
     <color name="colorHomeBox">#ffffff</color>
+    <color name="colorDianLan">#065279</color>
 </resources>

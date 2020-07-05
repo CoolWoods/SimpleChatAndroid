@@ -1,5 +1,6 @@
 package com.simplechat.ui.chat;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +13,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.simplechat.R;
-import com.simplechat.ui.chat.ChatActivity;
-import com.simplechat.ui.chat.Msg;
 
-import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MsgAdapter extends ArrayAdapter<Msg> {
@@ -30,7 +32,6 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
         Msg msg=getItem(position);
         View view;
         ViewHolder viewHolder;
-        int type;
         if(convertView == null) {
             view = LayoutInflater.from(getContext()).inflate(resourceId, null);
             viewHolder = new ViewHolder();
@@ -48,28 +49,25 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
             viewHolder =(ViewHolder)view.getTag();
         }
 
-            if(msg.getType() ==Msg.TYPE_RECEIVED) {//0
-                viewHolder.leftLayout.setVisibility(View.VISIBLE);
-                viewHolder.rightLayout.setVisibility(View.GONE);
-                viewHolder.head1.setVisibility(View.VISIBLE);
-                viewHolder.head2.setVisibility(View.GONE);
-                viewHolder.time1.setVisibility(View.VISIBLE);
-                viewHolder.time2.setVisibility(View.GONE);
-                viewHolder.leftMsg.setText(msg.getMessageContent());
-                viewHolder.time1.setText(msg.getMessageDate());
-            } else if(msg.getType() ==Msg.TYPE_SEND) {//1
-                viewHolder.rightLayout.setVisibility(View.VISIBLE);
-                viewHolder.leftLayout.setVisibility(View.GONE);
-                viewHolder.head1.setVisibility(View.GONE);
-                viewHolder.head2.setVisibility(View.VISIBLE);
-                viewHolder.time1.setVisibility(View.GONE);
-                viewHolder.time2.setVisibility(View.VISIBLE);
-                viewHolder.rightMsg.setText(msg.getMessageContent());
-                viewHolder.time2.setText(msg.getMessageDate());
-            }
-
-
-
+        if(msg.getType() ==Msg.TYPE_RECEIVED) {//0
+            viewHolder.leftLayout.setVisibility(View.VISIBLE);
+            viewHolder.rightLayout.setVisibility(View.GONE);
+            viewHolder.head1.setVisibility(View.VISIBLE);
+            viewHolder.head2.setVisibility(View.GONE);
+            viewHolder.time1.setVisibility(View.VISIBLE);
+            viewHolder.time2.setVisibility(View.GONE);
+            viewHolder.leftMsg.setText(msg.getMessageContent());
+            viewHolder.time1.setText(simpleDateFormat(new Date(),msg.getMessageDate()));
+        } else if(msg.getType() ==Msg.TYPE_SEND) {//1
+            viewHolder.rightLayout.setVisibility(View.VISIBLE);
+            viewHolder.leftLayout.setVisibility(View.GONE);
+            viewHolder.head1.setVisibility(View.GONE);
+            viewHolder.head2.setVisibility(View.VISIBLE);
+            viewHolder.time1.setVisibility(View.GONE);
+            viewHolder.time2.setVisibility(View.VISIBLE);
+            viewHolder.rightMsg.setText(msg.getMessageContent());
+            viewHolder.time2.setText(simpleDateFormat(new Date(),msg.getMessageDate()));
+        }
 
         return view;
     }
@@ -83,6 +81,39 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
         ImageView head2;
         TextView time1;
         TextView time2;
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private String simpleDateFormat(Date now, Date date) {
+        //两者的时间差，毫秒
+        long l = now.getTime() - date.getTime();
+        //两者差的天数
+        long day = l/(24*60*60*1000);
+        //星期数组
+        String[] weekDays = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
+        //Calendar用于日期计算方便
+        Calendar calendarDate = Calendar.getInstance();
+        Calendar calendarNow =  Calendar.getInstance();
+        calendarNow.setTime(now);
+        calendarDate.setTime(date);
+        //数据库时间在一周中的位置
+        int week = calendarDate.get(Calendar.DAY_OF_WEEK)-1;
+        if (week < 0 ) week=0;
+        //Date格式化
+        DateFormat df = null;
+        switch ((int) day){
+            case 0:  df = new SimpleDateFormat("HH:mm");
+                return df.format(now);
+            case 1: return "昨天";
+            case 2: return "前天";
+            case 3:
+            case 5:
+            case 4:
+            case 6:
+                return weekDays[week];
+            default: df = new SimpleDateFormat("M月d日");
+                return df.format(date);
+        }
     }
 
 }

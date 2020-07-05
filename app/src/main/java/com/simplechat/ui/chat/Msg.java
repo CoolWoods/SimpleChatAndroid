@@ -10,17 +10,17 @@ public class Msg implements Serializable {
     private String username;
     private  String fUsername;
     private String messageContent;
-    private String messageDate;
+    private Date messageDate;
     private int type;
 
-    public Msg(String username, String fUsername, String messageContent, String messageDate, int type) {
+    public Msg(){}
+    public Msg(String username, String fUsername, String messageContent, Date messageDate, int type) {
         this.username = username;
         this.fUsername = fUsername;
         this.messageContent = messageContent;
         this.messageDate = messageDate;
         this.type = type;
     }
-    public Msg(){}
     public Integer getMessageId() {
         return messageId;
     }
@@ -53,11 +53,11 @@ public class Msg implements Serializable {
         this.messageContent = messageContent;
     }
 
-    public String  getMessageDate() {
+    public Date  getMessageDate() {
         return messageDate;
     }
 
-    public void setMessageDate(String messageDate) {
+    public void setMessageDate(Date messageDate) {
         this.messageDate = messageDate;
     }
 

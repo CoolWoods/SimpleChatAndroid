@@ -5,13 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,19 +20,19 @@ import androidx.fragment.app.ListFragment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
 import com.simplechat.ui.chat.ChatActivity;
+import com.simplechat.ui.domain.Contact;
 import com.simplechat.ui.domain.User;
-import com.simplechat.ui.friendlist.domain.Friend;
 import com.simplechat.ui.message.domain.MessageListItem;
 import com.simplechat.utils.FileUtils;
 import com.simplechat.utils.OkHttpUtils;
 import com.simplechat.utils.RequestUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,18 +46,20 @@ import okhttp3.Response;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class MessageFragment extends ListFragment {
-
     private static MessageAdapter adapter;
     private static List<MessageListItem> messageList;
     private static final   String BASE_URL = "http://10.0.2.2:8080/SimpleChat/";
     private static User user;
+    private static Contact contact;
+
+    //mHandler用于实现轮询
+    private Handler mHandler;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //发送请求获取数据，并更新适配器数据
-        user = new User();
-        user.setUsername("123456");
-        sendRequestAndUpdateAdaptor();
+        init();
+        //使用轮询的方式获取数据，更新视图
+        sendRequestInterval();
     }
 
     @Nullable
@@ -70,23 +72,26 @@ public class MessageFragment extends ListFragment {
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        TextView nickname = (TextView) v.findViewById(R.id.nickname);
         Intent intent = new Intent(getActivity(), ChatActivity.class);
         //用数据捆传递数据
         MessageListItem messageListItem = messageList.get(position);
-
-        //封装一个friend对象传给给消息页面
-        Friend friend = new Friend();
-        friend.setFUsername(messageListItem.getFUsername());
-        friend.setUsername(messageListItem.getUsername());
-        friend.setNickname(messageListItem.getNickname());
-
+        Contact contact = new Contact();
+        contact.setUsername(messageListItem.getUsername());
+        contact.setFUsername(messageListItem.getFUsername());
+        contact.setRemark(messageListItem.getNickname());
+        //封装一个contact对象传给给消息页面
         Bundle bundle = new Bundle();
-        bundle.putSerializable("friend", (Serializable) friend);
-        intent.putExtra("bun", bundle);
+        bundle.putSerializable("contact", contact);
+        intent.putExtra("contactBundle", bundle);
         startActivity(intent);
     }
 
+    private void init(){
+        Intent intent = this.getActivity().getIntent();
+        Bundle userBundle = intent.getBundleExtra("userBundle");
+        assert userBundle != null;
+        user = (User) userBundle.getSerializable("user");
+    }
     private void setAdapter(String responseData){
 
         try {
@@ -123,8 +128,34 @@ public class MessageFragment extends ListFragment {
         //定义访问的api
         String url = BASE_URL + "message/getUiMessageItemList";
         Map<String, String> reqMap = new HashMap<String, String>();
-        reqMap.put("username", "123456");
+        reqMap.put("username", user.getUsername());
         return RequestUtils.buildRequestForPostByForm(url, reqMap);
+    }
+
+
+    @SuppressLint("HandlerLeak")
+    private void sendRequestInterval(){
+        mHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                if (msg.what == 1) {//System.out.println("访问成功:\n" + responseData);
+                    //获取运行在子线程中的OkHttp访问得到的数据
+                    String result = (String) msg.getData().getSerializable("responseData");
+                    //利用返回的数据更新适配器
+                    setAdapter(result);
+                }
+            }
+        };
+
+        System.out.println("sendRequestInterval");
+        Runnable mTimeCounterRunnable = new Runnable() {
+            @Override
+            public void run() {//在此添加需轮寻的接口
+                sendRequestAndUpdateAdaptor();;//getUnreadCount()执行的任务
+                //4秒一次
+                mHandler.postDelayed(this, 4 * 1000);
+            }
+        };
+        mTimeCounterRunnable.run();
     }
 
     private void sendRequestAndUpdateAdaptor(){
@@ -136,57 +167,41 @@ public class MessageFragment extends ListFragment {
         }catch (Exception e){
             e.printStackTrace();
         }
-        //从服务器获取消息列表
-        try {
-            //handler start
-            @SuppressLint("HandlerLeak") Handler handler = new Handler() {
-                public void handleMessage(Message msg) {
-                    if (msg.what == 1) {//System.out.println("访问成功:\n" + responseData);
-                        //获取运行在子线程中的OkHttp访问得到的数据
-                        String result = (String) msg.getData().getSerializable("responseData");
-                        System.out.println("Handler:" + result);
-                        //利用返回的数据更新适配器
-                        setAdapter(result);
-                    }
-                }
-            };
-            //handler end
+        //OkHttp start
+        //获取一个OkHttpClient实例
+        OkHttpClient client = OkHttpUtils.getInstance();
+        //获取一个request对象
+        Request request = initRequest();
+        //使用OkHttpClient实例执行请求
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d(TAG, "onFailure:", e);
+            }
 
-            //OkHttp start
-            //获取一个OkHttpClient实例
-            OkHttpClient client = OkHttpUtils.getInstance();
-            //获取一个request对象
-            Request request = initRequest();
-            //使用OkHttpClient实例执行请求
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d(TAG, "onFailure:", e);
-                }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseData = response.body().string();
+                //System.out.println(responseData);
+                //利用Message向主线程传送数据
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String date = sdf.format(new Date());
+                System.out.println("时间：" + date);
+                System.out.println("查询结果：" + responseData);
+                Message message = new Message();
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String responseData = response.body().string();
-                    //System.out.println(responseData);
+                //数据比较大，使用Bundle封装
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("responseData", responseData);
 
-                    //利用Message向主线程传送数据
-                    Message message = new Message();
-
-                    //数据比较大，使用Bundle封装
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("responseData", responseData);
-
-                    //将bundle存入message
-                    message.setData(bundle);
-                    //设置handler什么时候作用
-                    message.what = 1;
-                    //向主线程发消息
-                    handler.sendMessage(message);
-                }
-            });
-            //OkHttp end
-        } catch (Exception e){
-            Log.e(TAG, "handler failure", e);
-        }
+                //将bundle存入message
+                message.setData(bundle);
+                //设置handler什么时候作用
+                message.what = 1;
+                //向主线程发消息
+                mHandler.sendMessage(message);
+            }
+        });
+        //OkHttp end
     }
 }
