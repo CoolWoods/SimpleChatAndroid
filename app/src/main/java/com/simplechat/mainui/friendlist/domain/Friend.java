@@ -1,4 +1,4 @@
-package com.simplechat.ui.friendlist.domain;
+package com.simplechat.mainui.friendlist.domain;
 
 import java.io.Serializable;
 

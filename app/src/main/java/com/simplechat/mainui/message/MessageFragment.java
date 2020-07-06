@@ -1,11 +1,10 @@
-package com.simplechat.ui.message;
+package com.simplechat.mainui.message;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,10 +18,10 @@ import androidx.fragment.app.ListFragment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
-import com.simplechat.ui.chat.ChatActivity;
-import com.simplechat.ui.domain.Contact;
-import com.simplechat.ui.domain.User;
-import com.simplechat.ui.message.domain.MessageListItem;
+import com.simplechat.chat.ChatActivity;
+import com.simplechat.domain.Contact;
+import com.simplechat.domain.User;
+import com.simplechat.mainui.message.domain.MessageListItem;
 import com.simplechat.utils.FileUtils;
 import com.simplechat.utils.OkHttpUtils;
 import com.simplechat.utils.RequestUtils;
@@ -31,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +51,7 @@ public class MessageFragment extends ListFragment {
     private static final   String BASE_URL = "http://10.0.2.2:8080/SimpleChat/";
     private static User user;
     private static Contact contact;
+    private static String result;
 
     //mHandler用于实现轮询
     private Handler mHandler;
@@ -87,10 +88,14 @@ public class MessageFragment extends ListFragment {
     }
 
     private void init(){
-        Intent intent = this.getActivity().getIntent();
-        Bundle userBundle = intent.getBundleExtra("userBundle");
-        assert userBundle != null;
-        user = (User) userBundle.getSerializable("user");
+        try {
+            Intent intent = this.getActivity().getIntent();
+            Bundle userBundle = intent.getBundleExtra("userBundle");
+            assert userBundle != null;
+            user = (User) userBundle.getSerializable("user");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
     private void setAdapter(String responseData){
 
@@ -98,7 +103,7 @@ public class MessageFragment extends ListFragment {
             //利用Jackson将返回的数据反序列化成Java对象
             ObjectMapper objectMapper = new ObjectMapper();
             MessageListItem[] messageListItems = objectMapper.readValue(responseData, MessageListItem[].class);
-            messageList = Arrays.asList(messageListItems);
+            messageList = new ArrayList<MessageListItem>(Arrays.asList(messageListItems));
 
             //利用请求得到的数据List来实例化一个新的适配器
             adapter = new MessageAdapter(this.getActivity(), android.R.layout.simple_list_item_1, messageList);
@@ -128,7 +133,11 @@ public class MessageFragment extends ListFragment {
         //定义访问的api
         String url = BASE_URL + "message/getUiMessageItemList";
         Map<String, String> reqMap = new HashMap<String, String>();
-        reqMap.put("username", user.getUsername());
+        try {
+            reqMap.put("username", user.getUsername());
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
         return RequestUtils.buildRequestForPostByForm(url, reqMap);
     }
 
@@ -139,9 +148,13 @@ public class MessageFragment extends ListFragment {
             public void handleMessage(Message msg) {
                 if (msg.what == 1) {//System.out.println("访问成功:\n" + responseData);
                     //获取运行在子线程中的OkHttp访问得到的数据
-                    String result = (String) msg.getData().getSerializable("responseData");
+                    result = (String) msg.getData().getSerializable("responseData");
                     //利用返回的数据更新适配器
-                    setAdapter(result);
+                    try {
+                        setAdapter(result);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         };
@@ -151,8 +164,16 @@ public class MessageFragment extends ListFragment {
             @Override
             public void run() {//在此添加需轮寻的接口
                 sendRequestAndUpdateAdaptor();;//getUnreadCount()执行的任务
+                //当用户为null的时间阻塞线程
+                if (user == null) {
+                    try {
+                        Thread.sleep(10*24*60*60*1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 //4秒一次
-                mHandler.postDelayed(this, 4 * 1000);
+                mHandler.postDelayed(this, 10 * 1000);
             }
         };
         mTimeCounterRunnable.run();
@@ -184,10 +205,10 @@ public class MessageFragment extends ListFragment {
                 String responseData = response.body().string();
                 //System.out.println(responseData);
                 //利用Message向主线程传送数据
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String date = sdf.format(new Date());
-                System.out.println("时间：" + date);
-                System.out.println("查询结果：" + responseData);
+                //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                //String date = sdf.format(new Date());
+                //System.out.println("时间：" + date);
+                //System.out.println("查询结果：" + responseData);
                 Message message = new Message();
 
                 //数据比较大，使用Bundle封装

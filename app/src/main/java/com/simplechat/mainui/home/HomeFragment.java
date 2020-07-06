@@ -1,10 +1,11 @@
-package com.simplechat.ui.home;
+package com.simplechat.mainui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,7 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.simplechat.R;
-import com.simplechat.ui.domain.User;
+import com.simplechat.domain.User;
+import com.simplechat.login.LoginActivity;
+import com.simplechat.mainui.MainUiActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +29,7 @@ public class HomeFragment extends Fragment {
     private TextView birthday;
     private TextView tel;
     private TextView email;
+    private Button bnSignout;
     private User user;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,9 +40,24 @@ public class HomeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         init(root);
+        setClickListener();
         return root;
     }
 
+    private void setClickListener(){
+        bnSignout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    HomeFragment.this.getActivity().deleteFile("saveUser.dat");
+                    Intent intent = new Intent(HomeFragment.this.getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
     private void init(View root){
         //head = findViewById(R.id.image_head);
         try {
@@ -49,10 +68,12 @@ public class HomeFragment extends Fragment {
             birthday = root.findViewById(R.id.text_birthday);
             tel = root.findViewById(R.id.text_tel);
             email = root.findViewById(R.id.text_email);
+            bnSignout = root.findViewById(R.id.bn_signout);
         }catch (Exception e){
             e.printStackTrace();
         }
 
+        //获取登录的用户信息
         try {
             Intent intent = this.getActivity().getIntent();
 

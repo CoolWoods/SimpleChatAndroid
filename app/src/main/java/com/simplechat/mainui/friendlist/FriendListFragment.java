@@ -1,6 +1,5 @@
-package com.simplechat.ui.friendlist;
+package com.simplechat.mainui.friendlist;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,9 +18,9 @@ import androidx.fragment.app.ListFragment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
-import com.simplechat.ui.domain.User;
-import com.simplechat.ui.friendlist.domain.Friend;
-import com.simplechat.ui.userinfo.UserInfoActivity;
+import com.simplechat.domain.User;
+import com.simplechat.mainui.friendlist.domain.Friend;
+import com.simplechat.userinfo.UserInfoActivity;
 import com.simplechat.utils.FileUtils;
 import com.simplechat.utils.OkHttpUtils;
 import com.simplechat.utils.RequestUtils;
@@ -86,12 +85,14 @@ public class FriendListFragment extends ListFragment {
 //        从loginActivity中获取user对象
 //        Bundle userBundle = this.getActivity().getIntent().getBundleExtra("userBundle");
 //        User user = (User) userBundle.getSerializable("user");
-
-        //暂时使用假数据
-        Intent intent = this.getActivity().getIntent();
-        Bundle userBundle = intent.getBundleExtra("userBundle");
-        assert userBundle != null;
-        user = (User) userBundle.getSerializable("user");
+        try {
+            Intent intent = this.getActivity().getIntent();
+            Bundle userBundle = intent.getBundleExtra("userBundle");
+            assert userBundle != null;
+            user = (User) userBundle.getSerializable("user");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -115,14 +116,18 @@ public class FriendListFragment extends ListFragment {
         //放在try catch里面运行，避免程序闪退
         try {
             //handler start
-            @SuppressLint("HandlerLeak") Handler handler = new Handler() {
+            Handler handler = new Handler() {
                 public void handleMessage(Message msg) {
                     if (msg.what == 1) {//System.out.println("访问成功:\n" + responseData);
                         //获取运行在子线程中的OkHttp访问得到的数据
                         String result = (String) msg.getData().getSerializable("responseData");
                         System.out.println("Handler:" + result);
                         //利用返回的数据更新适配器
-                        setAdapter(result);
+                        try {
+                            setAdapter(result);
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 }
             };

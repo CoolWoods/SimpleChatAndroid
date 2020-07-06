@@ -1,4 +1,4 @@
-package com.simplechat.ui.message.domain;
+package com.simplechat.mainui.message.domain;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.simplechat.ui.friendlist;
+package com.simplechat.mainui.friendlist;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.simplechat.R;
-import com.simplechat.ui.friendlist.domain.Friend;
+import com.simplechat.mainui.friendlist.domain.Friend;
 
 import java.util.List;
 

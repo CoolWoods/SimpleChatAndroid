@@ -1,4 +1,4 @@
-package com.simplechat.ui.chat;
+package com.simplechat.chat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,7 +17,7 @@ import android.widget.ListView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
-import com.simplechat.ui.domain.Contact;
+import com.simplechat.domain.Contact;
 import com.simplechat.utils.FileUtils;
 import com.simplechat.utils.RequestUtils;
 
@@ -82,7 +82,7 @@ public class ChatActivity extends AppCompatActivity {
     private void initData() {
         //从文件中获取消息列表
         try {
-            FileInputStream fis = this.openFileInput("msgList22"+ contact.getUsername() + ".dat");
+            FileInputStream fis = this.openFileInput("msgList"+ contact.getUsername() + ".dat");
             String readTextFile = FileUtils.readTextFile(fis);
             ObjectMapper objectMapper = new ObjectMapper();
             try {

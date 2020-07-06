@@ -24,7 +24,7 @@
         android:layout_toEndOf="@+id/user_image"
         android:text="测试文字"
         android:textSize="16sp"
-        android:textColor="@color/colorNickname"
+        android:textColor="@color/colorDarkBlack"
         android:textStyle="bold" />
     <TextView
         android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
         android:id="@+id/user_message"
         android:text="测试文字"
         android:textSize="14sp"
-        android:textColor="@color/colorRecentMsg"
+        android:textColor="@color/colorMiddleBlack"
         android:singleLine="true"
         android:maxEms="16"
         android:layout_gravity="center_vertical" />

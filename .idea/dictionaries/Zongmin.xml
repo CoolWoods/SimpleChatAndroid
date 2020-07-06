@@ -3,6 +3,9 @@
     <words>
       <w>addfriend</w>
       <w>friendlist</w>
+      <w>mainui</w>
+      <w>repassword</w>
+      <w>signout</w>
       <w>simplechat</w>
       <w>userinfo</w>
       <w>userlist</w>

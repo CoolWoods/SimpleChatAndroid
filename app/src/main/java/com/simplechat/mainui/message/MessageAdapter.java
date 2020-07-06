@@ -1,4 +1,4 @@
-package com.simplechat.ui.message;
+package com.simplechat.mainui.message;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.simplechat.R;
-import com.simplechat.ui.message.domain.MessageListItem;
+import com.simplechat.mainui.message.domain.MessageListItem;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -54,7 +54,7 @@ public class MessageAdapter extends ArrayAdapter<MessageListItem> {
 
         //数据库中的时间
         Date date = messageListItem.getLastMsgDate();
-        msgClock.setText(dateFormat(new Date(), date));
+        msgClock.setText(dateFormat(date));
         //DateFormat df = new SimpleDateFormat("M月d日");
         return view;
     }
@@ -62,13 +62,13 @@ public class MessageAdapter extends ArrayAdapter<MessageListItem> {
 
     /**
      * 格式化消息列表中要显示的时间
-     * @param now 现在的时间
      * @param date  数据库中的时间
      * @return 格式化之后的字符时间
      */
     @SuppressLint("SimpleDateFormat")
-    private static String dateFormat(Date now, Date date){
+    private static String dateFormat(Date date){
         //两者的时间差，毫秒
+        Date now = new Date();
         long l = now.getTime() - date.getTime();
         //两者差的天数
         long day = l/(24*60*60*1000);
@@ -86,7 +86,7 @@ public class MessageAdapter extends ArrayAdapter<MessageListItem> {
         DateFormat df = null;
         switch ((int) day){
             case 0:  df = new SimpleDateFormat("HH:mm");
-                return df.format(now);
+                return df.format(date);
             case 1: return "昨天";
             case 2: return "前天";
             case 3:

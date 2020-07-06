@@ -1,4 +1,4 @@
-package com.simplechat.ui.chat;
+package com.simplechat.chat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -37,11 +37,11 @@ public class Msg implements Serializable {
         this.username = username;
     }
 
-    public String getfUsername() {
+    public String getFUsername() {
         return fUsername;
     }
 
-    public void setfUsername(String fUsername) {
+    public void setFUsername(String fUsername) {
         this.fUsername = fUsername;
     }
 

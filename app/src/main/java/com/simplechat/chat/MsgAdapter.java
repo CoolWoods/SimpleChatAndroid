@@ -1,4 +1,4 @@
-package com.simplechat.ui.chat;
+package com.simplechat.chat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -57,7 +57,7 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
             viewHolder.time1.setVisibility(View.VISIBLE);
             viewHolder.time2.setVisibility(View.GONE);
             viewHolder.leftMsg.setText(msg.getMessageContent());
-            viewHolder.time1.setText(simpleDateFormat(new Date(),msg.getMessageDate()));
+            viewHolder.time1.setText(simpleDateFormat(msg.getMessageDate()));
         } else if(msg.getType() ==Msg.TYPE_SEND) {//1
             viewHolder.rightLayout.setVisibility(View.VISIBLE);
             viewHolder.leftLayout.setVisibility(View.GONE);
@@ -66,7 +66,7 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
             viewHolder.time1.setVisibility(View.GONE);
             viewHolder.time2.setVisibility(View.VISIBLE);
             viewHolder.rightMsg.setText(msg.getMessageContent());
-            viewHolder.time2.setText(simpleDateFormat(new Date(),msg.getMessageDate()));
+            viewHolder.time2.setText(simpleDateFormat(msg.getMessageDate()));
         }
 
         return view;
@@ -84,8 +84,9 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private String simpleDateFormat(Date now, Date date) {
+    private String simpleDateFormat(Date date) {
         //两者的时间差，毫秒
+        Date now = new Date();
         long l = now.getTime() - date.getTime();
         //两者差的天数
         long day = l/(24*60*60*1000);
@@ -103,7 +104,7 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
         DateFormat df = null;
         switch ((int) day){
             case 0:  df = new SimpleDateFormat("HH:mm");
-                return df.format(now);
+                return df.format(date);
             case 1: return "昨天";
             case 2: return "前天";
             case 3:

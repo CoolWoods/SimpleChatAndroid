@@ -41,7 +41,7 @@
             android:layout_marginEnd="5dp"
             android:background="@drawable/button_circle_shape"
             android:text="@string/btn_send"
-            android:textColor="@color/colorSendBtnText"
+            android:textColor="@color/colorStrongWhite"
             android:textSize="14sp" />
 
     </LinearLayout>
