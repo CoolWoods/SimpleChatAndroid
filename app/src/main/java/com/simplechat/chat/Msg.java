@@ -14,11 +14,10 @@ public class Msg implements Serializable {
     private int type;
 
     public Msg(){}
-    public Msg(String username, String fUsername, String messageContent, Date messageDate, int type) {
+    public Msg(String username, String fUsername, String messageContent, int type) {
         this.username = username;
         this.fUsername = fUsername;
         this.messageContent = messageContent;
-        this.messageDate = messageDate;
         this.type = type;
     }
     public Integer getMessageId() {

@@ -54,19 +54,28 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
             viewHolder.rightLayout.setVisibility(View.GONE);
             viewHolder.head1.setVisibility(View.VISIBLE);
             viewHolder.head2.setVisibility(View.GONE);
-            viewHolder.time1.setVisibility(View.VISIBLE);
             viewHolder.time2.setVisibility(View.GONE);
             viewHolder.leftMsg.setText(msg.getMessageContent());
-            viewHolder.time1.setText(simpleDateFormat(msg.getMessageDate()));
+            try {
+                viewHolder.time1.setVisibility(View.VISIBLE);
+                viewHolder.time1.setText(simpleDateFormat(msg.getMessageDate()));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         } else if(msg.getType() ==Msg.TYPE_SEND) {//1
             viewHolder.rightLayout.setVisibility(View.VISIBLE);
             viewHolder.leftLayout.setVisibility(View.GONE);
             viewHolder.head1.setVisibility(View.GONE);
-            viewHolder.head2.setVisibility(View.VISIBLE);
             viewHolder.time1.setVisibility(View.GONE);
             viewHolder.time2.setVisibility(View.VISIBLE);
             viewHolder.rightMsg.setText(msg.getMessageContent());
-            viewHolder.time2.setText(simpleDateFormat(msg.getMessageDate()));
+
+            try {
+                viewHolder.head2.setVisibility(View.VISIBLE);
+                viewHolder.time2.setText(simpleDateFormat(msg.getMessageDate()));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         return view;

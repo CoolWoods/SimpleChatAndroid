@@ -96,6 +96,15 @@ public class MessageFragment extends ListFragment {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        //从文件中获取消息列表
+        try {
+            FileInputStream fis = this.getActivity().openFileInput("messageList"+user.getUsername() + ".dat");
+            String readTextFile = FileUtils.readTextFile(fis);
+            setAdapter(readTextFile);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
     private void setAdapter(String responseData){
 
@@ -180,14 +189,7 @@ public class MessageFragment extends ListFragment {
     }
 
     private void sendRequestAndUpdateAdaptor(){
-        //从文件中获取消息列表
-        try {
-            FileInputStream fis = this.getActivity().openFileInput("messageList"+user.getUsername() + ".dat");
-            String readTextFile = FileUtils.readTextFile(fis);
-            setAdapter(readTextFile);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
         //OkHttp start
         //获取一个OkHttpClient实例
         OkHttpClient client = OkHttpUtils.getInstance();

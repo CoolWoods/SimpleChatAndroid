@@ -190,6 +190,7 @@ public class LoginActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Toast.makeText(LoginActivity.this, "请检查网络！", Toast.LENGTH_SHORT).show();
             }
 
             @Override
