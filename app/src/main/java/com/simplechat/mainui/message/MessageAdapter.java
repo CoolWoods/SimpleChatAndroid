@@ -2,7 +2,16 @@ package com.simplechat.mainui.message;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,16 +25,20 @@ import androidx.annotation.RequiresApi;
 
 import com.simplechat.R;
 import com.simplechat.mainui.message.domain.MessageListItem;
+import com.simplechat.utils.OkHttpUtils;
+import com.simplechat.utils.RequestUtils;
+import com.simplechat.webservices.RequestImage;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+
 public class MessageAdapter extends ArrayAdapter<MessageListItem> {
     private List<MessageListItem> messageListItems;
-
     public MessageAdapter(@NonNull Context context, int resource, @NonNull List<MessageListItem> objects) {
         super(context, resource, objects);
         messageListItems = objects;
@@ -47,14 +60,20 @@ public class MessageAdapter extends ArrayAdapter<MessageListItem> {
         TextView userSign = (TextView) view.findViewById(R.id.user_message);
         //最后一条消息的时间
         TextView msgClock = (TextView) view.findViewById(R.id.msg_clock);
-        MessageListItem messageListItem = messageListItems.get(position);
-        userImage.setImageResource(R.mipmap.ic_launcher);
-        username.setText(messageListItem.getNickname());
-        userSign.setText(messageListItem.getLastMsg());
 
-        //数据库中的时间
-        Date date = messageListItem.getLastMsgDate();
-        msgClock.setText(dateFormat(date));
+        try {
+            MessageListItem messageListItem = messageListItems.get(position);
+            username.setText(messageListItem.getNickname());
+            userSign.setText(messageListItem.getLastMsg());
+            String imageName = messageListItem.getHead();
+            //数据库中的时间
+            Date date = messageListItem.getLastMsgDate();
+            msgClock.setText(dateFormat(date));
+            RequestImage requestImage = new RequestImage();
+            requestImage.sendRequestImage(userImage, imageName);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         //DateFormat df = new SimpleDateFormat("M月d日");
         return view;
     }
@@ -98,4 +117,5 @@ public class MessageAdapter extends ArrayAdapter<MessageListItem> {
                 return df.format(date);
         }
     }
+
 }

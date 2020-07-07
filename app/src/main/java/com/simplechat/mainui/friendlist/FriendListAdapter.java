@@ -13,11 +13,14 @@ import androidx.annotation.Nullable;
 
 import com.simplechat.R;
 import com.simplechat.mainui.friendlist.domain.Friend;
+import com.simplechat.webservices.RequestImage;
 
 import java.util.List;
 
 public class FriendListAdapter extends ArrayAdapter<Friend> {
     private List<Friend> friendList;
+
+    private Integer flag = 0;
 
     public FriendListAdapter(@NonNull Context context, int resource, @NonNull List<Friend> objects) {
         super(context, resource, objects);
@@ -35,9 +38,15 @@ public class FriendListAdapter extends ArrayAdapter<Friend> {
         //用户个性签名
         TextView userSign = (TextView) convertView.findViewById(R.id.user_sign);
         Friend friend = friendList.get(position);
-        userImage.setImageResource(R.mipmap.ic_launcher);
         username.setText(friend.getNickname());
         userSign.setText(friend.getSignature());
+        String imageName = friend.getHead();
+        try {
+            RequestImage requestImage = new RequestImage();
+            requestImage.sendRequestImage(userImage, imageName);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         //DateFormat df = new SimpleDateFormat("M月d日");
         return convertView;
     }

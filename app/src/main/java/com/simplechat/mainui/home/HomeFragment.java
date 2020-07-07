@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,13 +16,14 @@ import androidx.fragment.app.Fragment;
 import com.simplechat.R;
 import com.simplechat.domain.User;
 import com.simplechat.login.LoginActivity;
-import com.simplechat.mainui.MainUiActivity;
+import com.simplechat.webservices.RequestImage;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
 public class HomeFragment extends Fragment {
+    private ImageView imagHead;
     private TextView nickname;
     private TextView username;
     private TextView signature;
@@ -31,6 +33,8 @@ public class HomeFragment extends Fragment {
     private TextView email;
     private Button bnSignout;
     private User user;
+
+    private Integer flag = 0;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +65,7 @@ public class HomeFragment extends Fragment {
     private void init(View root){
         //head = findViewById(R.id.image_head);
         try {
+            imagHead = root.findViewById(R.id.image_head);
             nickname = root.findViewById(R.id.text_nickname);
             username = root.findViewById(R.id.text_username);
             signature = root.findViewById(R.id.text_signature);
@@ -106,9 +111,20 @@ public class HomeFragment extends Fragment {
                 sex.setText(user.getSex());
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
                 Date birthday = user.getBirthday();
-                this.birthday.setText(sdf.format(birthday));
+                try {
+                    this.birthday.setText(sdf.format(birthday));
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
                 tel.setText(user.getTel());
                 email.setText(user.getEmail());
+                String imageName = user.getHead();
+                if (flag == 0){
+                    RequestImage requestImage = new RequestImage();
+                    if (imageName == null) imageName="comment.png";
+                    requestImage.sendRequestImage(imagHead, imageName);
+                    flag = 1;
+                }
             }
         }catch (Exception e){
             e.printStackTrace();

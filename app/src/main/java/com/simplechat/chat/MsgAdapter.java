@@ -2,6 +2,8 @@ package com.simplechat.chat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +14,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.simplechat.MainActivity;
 import com.simplechat.R;
+import com.simplechat.webservices.RequestImage;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -22,7 +31,7 @@ import java.util.List;
 
 public class MsgAdapter extends ArrayAdapter<Msg> {
     private int resourceId;
-
+    private Integer flag = 0;
     public MsgAdapter(@NonNull Context context,int textViewResourceId, @NonNull List<Msg> objects) {
         super(context,textViewResourceId, objects);
         this.resourceId = textViewResourceId;
