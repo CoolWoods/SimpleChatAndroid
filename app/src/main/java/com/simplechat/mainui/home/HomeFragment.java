@@ -13,11 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
 import com.simplechat.domain.User;
 import com.simplechat.login.LoginActivity;
+import com.simplechat.utils.FileUtils;
 import com.simplechat.webservices.RequestImage;
 
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -78,18 +81,6 @@ public class HomeFragment extends Fragment {
             e.printStackTrace();
         }
 
-        //获取登录的用户信息
-        try {
-            Intent intent = this.getActivity().getIntent();
-
-            Bundle userBundle = intent.getBundleExtra("userBundle");
-            assert userBundle != null;
-            user = (User) userBundle.getSerializable("user");
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
         //清空布局中预设的内容
         try {
             nickname.setText(null);
@@ -102,6 +93,29 @@ public class HomeFragment extends Fragment {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        //从文件中获取用户信息
+        try {
+            FileInputStream fis = this.getActivity().openFileInput("loginUser" + ".dat");
+            String readTextFile = FileUtils.readTextFile(fis);
+            ObjectMapper objectMapper = new ObjectMapper();
+            user = objectMapper.readValue(readTextFile, User.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //获取登录的用户信息
+        try {
+            Intent intent = this.getActivity().getIntent();
+
+            Bundle userBundle = intent.getBundleExtra("userBundle");
+            assert userBundle != null;
+            user = (User) userBundle.getSerializable("user");
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
 
         try {
             if (user !=null){

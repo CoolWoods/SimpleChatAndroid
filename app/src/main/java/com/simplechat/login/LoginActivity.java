@@ -139,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {
                                 boolean isSuccess = formatResult(result);
                                 if (isSuccess){
                                     try {
-                                        FileOutputStream fos = LoginActivity.this.openFileOutput("user"+ user.getUsername() + ".dat", Context.MODE_PRIVATE);
+                                        FileOutputStream fos = LoginActivity.this.openFileOutput("loginUser" + ".dat", Context.MODE_PRIVATE);
                                         fos.write(result.getBytes());
                                         fos.close();
                                     } catch (Exception e){

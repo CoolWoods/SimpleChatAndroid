@@ -42,9 +42,9 @@ public class MainUiActivity extends AppCompatActivity {
 
     private void init(){
 
-        //从文件中获取消息列表
+        //从文件中用户信息
         try {
-            FileInputStream fis = this.openFileInput("user"+user.getUsername() + ".dat");
+            FileInputStream fis = this.openFileInput("u=loginUser" + ".dat");
             String readTextFile = FileUtils.readTextFile(fis);
             ObjectMapper objectMapper = new ObjectMapper();
             user = objectMapper.readValue(readTextFile, User.class);
