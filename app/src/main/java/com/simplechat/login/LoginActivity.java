@@ -138,6 +138,13 @@ public class LoginActivity extends AppCompatActivity {
                                 String result = (String) msg.getData().getSerializable("responseData");
                                 boolean isSuccess = formatResult(result);
                                 if (isSuccess){
+                                    try {
+                                        FileOutputStream fos = LoginActivity.this.openFileOutput("user"+ user.getUsername() + ".dat", Context.MODE_PRIVATE);
+                                        fos.write(result.getBytes());
+                                        fos.close();
+                                    } catch (Exception e){
+                                        e.printStackTrace();
+                                    }
                                     turnToMainUiActivity();
                                 } else {
                                     Toast.makeText(LoginActivity.this, "账号或密码错误！", Toast.LENGTH_SHORT).show();
@@ -249,6 +256,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void turnToMainUiActivity() {
+        //将消息存到本地，以便无网时使用
         //用户已登录成功，向MainActivity跳转，并携带用户信息
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 

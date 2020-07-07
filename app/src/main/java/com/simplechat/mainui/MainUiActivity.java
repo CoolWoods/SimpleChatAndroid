@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.simplechat.R;
 import com.simplechat.addfriend.AddFriendActivity;
 import com.simplechat.domain.User;
 import com.simplechat.login.LoginActivity;
+import com.simplechat.utils.FileUtils;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +18,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
+import java.io.FileInputStream;
 
 public class MainUiActivity extends AppCompatActivity {
     //已登录的用户
@@ -37,6 +41,17 @@ public class MainUiActivity extends AppCompatActivity {
     }
 
     private void init(){
+
+        //从文件中获取消息列表
+        try {
+            FileInputStream fis = this.openFileInput("user"+user.getUsername() + ".dat");
+            String readTextFile = FileUtils.readTextFile(fis);
+            ObjectMapper objectMapper = new ObjectMapper();
+            user = objectMapper.readValue(readTextFile, User.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         try {
             //获取已经登录的用户信息
             Bundle userBundle = getIntent().getBundleExtra("userBundle");
