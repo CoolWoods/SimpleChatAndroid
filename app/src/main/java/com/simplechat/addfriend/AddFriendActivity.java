@@ -14,11 +14,13 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
 import com.simplechat.domain.User;
+import com.simplechat.login.LoginActivity;
 import com.simplechat.utils.OkHttpUtils;
 import com.simplechat.utils.RequestUtils;
 
@@ -42,7 +44,7 @@ public class AddFriendActivity extends AppCompatActivity {
     private static EditText userSearchInput;
     private static ActionBar actionBar;
     private static ListView userResult;
-    private static List<User> result;
+    private List<User> result;
     private static User user;
     private static final   String BASE_URL = "http://10.0.2.2:8080/SimpleChat/";
     private UserAdapter userAdapter;
@@ -79,8 +81,12 @@ public class AddFriendActivity extends AppCompatActivity {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        userAdapter = new UserAdapter(this, android.R.layout.simple_list_item_1, result);
-        userResult.setAdapter(userAdapter);
+        if (null != result){
+            userAdapter = new UserAdapter(this, android.R.layout.simple_list_item_1, result);
+            userResult.setAdapter(userAdapter);
+        } else {
+            Toast.makeText(AddFriendActivity.this, "没有找到！", Toast.LENGTH_SHORT).show();
+        }
         /*Intent intent = new Intent(this, UserInfoActivity.class);
         startActivity(intent);*/
     }
