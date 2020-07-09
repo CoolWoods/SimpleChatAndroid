@@ -94,32 +94,40 @@ public class RegisterActivity extends AppCompatActivity{
                     if (!(password.equals(rePassword))) {
                         Toast.makeText(RegisterActivity.this, "两次输入的密码不一致，请重新输入！！！", Toast.LENGTH_SHORT).show();
                     } else {
-                        User register = new User();
-                        register.setNickname(nickname);
-                        register.setUsername(username);
-                        register.setPassword(password);
-                        //连接服务器注册
-                        //使用handler处理请求返回的消息
-                        mHandler = new Handler() {
-                            public void handleMessage(Message msg) {
-                                if (msg.what == 1) {//System.out.println("访问成功:\n" + responseData);
-                                    //获取运行在子线程中的OkHttp访问得到的数据
-                                    String result = (String) msg.getData().getSerializable("responseData");
-                                    boolean isSuccess = formatResult(result);
-                                    if (isSuccess){
-                                        turnToLoginActivity();
-                                    } else {
-                                        Toast.makeText(RegisterActivity.this, "用户名已存在！", Toast.LENGTH_SHORT).show();
-                                        //清空输入框内容
-                                        etUsername.setText("");
-                                        etPassword.setText("");
-                                        etRePassword.setText("");
+                        if(username.length()<6 || username.length()>20){
+                            Toast.makeText(RegisterActivity.this, "账号长度要求6-20内，请重新输入！！！", Toast.LENGTH_SHORT).show();
+                        }else {
+                            if(password.length()<6 || password.length()>20){
+                                Toast.makeText(RegisterActivity.this, "密码长度要求6-20内，请重新输入！！！", Toast.LENGTH_SHORT).show();
+                            }else {
+                                User register = new User();
+                                register.setNickname(nickname);
+                                register.setUsername(username);
+                                register.setPassword(password);
+                                //连接服务器注册
+                                //使用handler处理请求返回的消息
+                                mHandler = new Handler() {
+                                    public void handleMessage(Message msg) {
+                                        if (msg.what == 1) {//System.out.println("访问成功:\n" + responseData);
+                                            //获取运行在子线程中的OkHttp访问得到的数据
+                                            String result = (String) msg.getData().getSerializable("responseData");
+                                            boolean isSuccess = formatResult(result);
+                                            if (isSuccess){
+                                                turnToLoginActivity();
+                                            } else {
+                                                Toast.makeText(RegisterActivity.this, "用户名已存在！", Toast.LENGTH_SHORT).show();
+                                                //清空输入框内容
+                                                etUsername.setText("");
+                                                etPassword.setText("");
+                                                etRePassword.setText("");
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                        };
+                                };
 
-                        sendRegisterRequest(register);
+                                sendRegisterRequest(register);
+                            }
+                            }
                     }
                 }
             }

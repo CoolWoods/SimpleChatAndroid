@@ -71,16 +71,4 @@ public class MainUiActivity extends AppCompatActivity {
         getIntent().putExtra("userBundle", userBundle);
     }*/
 
-    public void addFriend(View view) {
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainUiActivity.this, AddFriendActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("user", user);
-                intent.putExtra("userBundle", bundle);
-                startActivity(intent);
-            }
-        });
-    }
 }

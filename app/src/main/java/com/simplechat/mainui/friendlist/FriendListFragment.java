@@ -18,7 +18,9 @@ import androidx.fragment.app.ListFragment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplechat.R;
+import com.simplechat.addfriend.AddFriendActivity;
 import com.simplechat.domain.User;
+import com.simplechat.mainui.MainUiActivity;
 import com.simplechat.mainui.friendlist.domain.Friend;
 import com.simplechat.userinfo.UserInfoActivity;
 import com.simplechat.utils.FileUtils;
@@ -52,9 +54,10 @@ public class FriendListFragment extends ListFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         //ListView的适配器
         //发送请求获取数据，并更新适配器数据
-       init();
+        init();
         sendRequestAndUpdateAdaptor();
     }
 
@@ -63,6 +66,7 @@ public class FriendListFragment extends ListFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friendlist, null);
         setListAdapter(adapter);
+        addFriendClickListener(view.findViewById(R.id.addfriend_box));
         return view;
     }
 
@@ -198,4 +202,16 @@ public class FriendListFragment extends ListFragment {
         }
     }
 
+    private void addFriendClickListener(View view) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FriendListFragment.this.getActivity(), AddFriendActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("user", user);
+                intent.putExtra("userBundle", bundle);
+                startActivity(intent);
+            }
+        });
+    }
 }
